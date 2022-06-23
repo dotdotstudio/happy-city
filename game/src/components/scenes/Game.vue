@@ -55,7 +55,7 @@
       <div class="back-button">
         <push-button class="green space-font-mono" narrow @click="restartGame()">
           <span><icon name="reply"></icon></span>
-          Retry
+          Play Again
         </push-button>
         <push-button class="orange space-font-mono" narrow @click="goToMenu()">
           <span><icon name="frown-o"></icon></span>
