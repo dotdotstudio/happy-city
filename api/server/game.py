@@ -388,7 +388,7 @@ class Game:
                 cls = random.choice(
                     list(filter(
                         lambda x: x != self.previous_game_modifier,
-                        [Symbols, FlipGrid, AsteroidsField, BlackHolesField, Alien]
+                        [Symbols]
                     ))
                 )
                 self.game_modifier = cls(self)
