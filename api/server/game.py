@@ -692,7 +692,7 @@ class Game:
             await Sio().emit("next_level", {
                 "level": self.level,
                 "modifier": self.game_modifier is not None,
-                "text": self.game_modifier.DESCRIPTION if self.game_modifier is not None else "No anomaly detected."
+                "text": self.game_modifier.DESCRIPTION if self.game_modifier is not None else "The public is happy - good job city management!."
             }, room=self.sio_room)
         else:
             # This was an useful command! Force new generation outside the loop
