@@ -105,7 +105,6 @@
       WelcomeText,
       GameField,
       DeathBarrier,
-      DeathBarrier,
       LevelIntro,
       PushButton
     },
