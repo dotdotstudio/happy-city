@@ -5,8 +5,9 @@ landfill,0
 compost,0
 recyling truck,0
 toxic waste,0
-rubbish bin,0
-mayor,0
+garbage bag,0
+water test,0
+street cleaner,0
 subway,1
 train,1
 bus,1
@@ -17,4 +18,26 @@ e-bike,1
 scooter,1
 roadworks,1
 station,1
-vote,1
+building consent,2
+construction,2
+architect,2
+engineer,2
+crane,2
+inspector,2
+builder,2
+building permit,2
+building code,2 
+rezone area,2
+construction license,2
+contractor,2
+tree,3
+park,3
+swing,3
+playground,3
+festival,3
+garden,3
+pool,3
+arborist,3
+horticulturalist,3
+gardener,3
+
