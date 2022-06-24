@@ -102,18 +102,22 @@ class CommandNameGenerator:
     def generate_command_name(self, role=0):
         generation_options = []
 
-        if self.words_storage.USE_PREFIXES == True:
-            option_1a = self.generate_compound_noun(role)
-            if option_1a is not None:
-                generation_options.append(option_1a)
-        else:
-            option_1b = self.generate_noun(role)
-            if option_1b is not None:
-                generation_options.append(option_1b)
+        # Basic nouns
+        option_nouns = self.generate_noun(role)
+        if option_nouns is not None:
+            generation_options.append(option_nouns)
 
-        option_2 = self.generate_adjective_noun(role)
-        if option_2 is not None:
-            generation_options.append(option_2)
+        # Compound nouns
+        if self.words_storage.USE_PREFIXES == True:
+            option_cnouns = self.generate_compound_noun(role)
+            if option_cnouns is not None:
+                generation_options.append(option_cnouns)
+
+        # Descriptive nouns
+        if self.words_storage.USE_ADJECTIVES == True:
+            option_adjectives = self.generate_adjective_noun(role)
+            if option_adjectives is not None:
+                generation_options.append(option_adjectives)
 
         if len(generation_options) == 0:
             print("ERROR: No options left")
