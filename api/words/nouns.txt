@@ -6,43 +6,92 @@ compost,0
 recyling truck,0
 toxic waste clean up,0
 household garbage,0
+waste transporter permit,0
 water test,0
 street cleaner,0
-rat,0
+manhole,0
+sewer line,0
+rat bait,0
+e-waste,0
 bees nest removal,0
+rabid racoon,0
 garbage collection,0
+waste violation,0
 subway station,1
-subway,1
+exhaust emissions,1
 L train,1
+A train,1
+7 train,1
+F train,1
+J train,1
+Z train,1
+6 train,1
+G train,1
+grand central station,1
 bus,1
+tramway,1
 ferry,1
 cycleway,1
+tour bus,1
 bike,1
+citibike dock,1
 e-bike,1
 scooter,1
+truck route,1
 roadworks,1
+sidewalk,1
+crosswalk,1
+bridge toll,1
+road toll,1
+speeding ticket,1
+road cones,1
 bus lane,1
-bus station,1
+bus stop,1
 parking ticket,1
 building consent,2
 construction,2
+demolition,2
 architect,2
 engineer,2
 crane,2
+concrete mixer,2
 inspector,2
 builder,2
 building permit,2
 building code,2 
 rezone area,2
-construction license,2
+construction permit,2
+gas,2
+electricity,2
+water pipe,2
 contractor,2
+electrician,2
+welder,2
+plumber,2
+certificate of occupancy,2
+boiler permit,2
+green roof,2
 tree,3
 park,3
 swing,3
 playground,3
-festival,3
-garden,3
+basketball court,3
+squash court,3
+grills,3
+botanical garden,3
+music festival,3
+amphitheatre,3
+food cart permit,3
+park bench,3
+rose garden,3
+cherry blossoms,3
+fountain,3
 pool,3
 arborist,3
 horticulturalist,3
 gardener,3
+path construction,3
+tree work permit,3
+ballpark,3
+planting permit,3
+
