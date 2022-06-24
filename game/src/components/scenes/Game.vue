@@ -8,7 +8,7 @@
       </transition>
 
       <transition name="v-fade">
-        <span class="outline" v-if="outroAnimation">New quarter starting!</span>
+        <span class="outline" v-if="outroAnimation">Good job!</span>
       </transition>
     </div>
     <div class="bottom" v-if="printingWelcome">

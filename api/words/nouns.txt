@@ -32,7 +32,7 @@ bus,1
 tramway,1
 ferry,1
 cycleway,1
-tour bus,1
+road closure,1
 bike,1
 citibike dock,1
 e-bike,1
