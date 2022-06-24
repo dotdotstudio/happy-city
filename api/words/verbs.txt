@@ -37,7 +37,6 @@ open
 close
 leave
 return
-wait for
 change
 swap
 accept
@@ -64,10 +63,11 @@ analyze
 move
 approach
 follow
-listen
-warn
 notify
 restart
 design
 deliver
 choose
+call 311
+decomission
+demolish
