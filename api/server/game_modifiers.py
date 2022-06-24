@@ -23,7 +23,7 @@ class GameModifier:
 
 
 class FlipGrid(GameModifier):
-    DESCRIPTION = "Reflection matrix activated!"
+    DESCRIPTION = "Uh oh - city chaos!"
 
     async def task(self):
         while True:
