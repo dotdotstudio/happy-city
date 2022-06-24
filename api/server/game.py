@@ -387,15 +387,15 @@ class Game:
             logging.debug("Current difficulty: {}".format(self.difficulty))
 
             # Game modifiers
-            if random.random() < self.difficulty["game_modifier_chance"]:
-                self.previous_game_modifier = self.game_modifier
-                cls = random.choice(
-                    list(filter(
-                        lambda x: x != self.previous_game_modifier,
-                        [Symbols]
-                    ))
-                )
-                self.game_modifier = cls(self)
+            #if random.random() < self.difficulty["game_modifier_chance"]:
+            #   self.previous_game_modifier = self.game_modifier
+            #    cls = random.choice(
+            #        list(filter(
+            #            lambda x: x != self.previous_game_modifier,
+            #            [Symbols]
+            #        ))
+            #    )
+            #    self.game_modifier = cls(self)
 
         # Set all `intro done` to false
         for i in self.slots:
