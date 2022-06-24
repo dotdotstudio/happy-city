@@ -5,6 +5,7 @@ from utils.singleton import singleton
 class WordsStorage:
     def __init__(self):
         self.USE_PREFIXES = False
+        self.USE_ADJECTIVES = False
 
         self.PREFIXES = [
             "MACRO" "MICRO",                                            # Size
