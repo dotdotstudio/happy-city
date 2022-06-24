@@ -77,16 +77,27 @@ new Vue({
         // as #event_name, so components can listen to them
         let [event, data] = eventData.data
         if (event.startsWith('error_')) {
-          console.error('Got error from server (' + event + '). Data below.')
+          console.error('Received error from server (' + event + '). Data below.')
           console.log(data)
         } else {
-          console.log('Got arbitrary event #' + event + '. Data below.')
+          console.log('Received event #' + event + '. Data below.')
           console.log(data)
           this.$bus.$emit('#' + event, data)
         }
       })
 
       this.$bus.$emit('#connected')
+
+      // Set global var for client role
+      //Vue.prototype.$role = "No role assigned"
+      Vue.prototype.$role = {
+        set: (roleName) => {
+          Vue.prototype.$role = roleName
+        },
+        get: () => {
+          return Vue.prototype.$role
+        }
+      }
     })
   }
 })

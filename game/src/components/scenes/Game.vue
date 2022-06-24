@@ -51,7 +51,7 @@
       <div>
         <icon class="icon" v-for="i in levelInfo.level" :key="i" name="smile-o" scale="3"></icon>
       </div>
-      <div class="space-font-mono"><span>{{ gameOverText }}</span></div>
+      <div class="space-font-mono"><span>Good job! The public loves you. We’re a happy city.</span></div>
       <div class="back-button">
         <push-button class="green space-font-mono" narrow @click="restartGame()">
           <span><icon name="reply"></icon></span>
@@ -95,9 +95,7 @@
           level: 1,
           modifier: null,
           modifierText: ''
-        },
-
-        gameOverText: ""
+        }
       }
     },
     components: {
@@ -111,11 +109,11 @@
     mounted () {
       // this.playBgm('static/music/ship_engine.mp3')
       this.$bus.$on('#game_started', (data) => {
+        console.log("INFO: (Game) Game restarted.")
         this.inIntro = true
         this.stopBgm()
         this.playSound('sounds/game_start.mp3')
         this.status = PRINTING_WELCOME
-        console.log(`restarting game`)
       })
 
       this.$bus.$on('#grid', (data) => {
@@ -125,6 +123,7 @@
       })
 
       this.$bus.$on('#health_info', (data) => {
+        console.log("INFO: Received health info")
         this.$set(this.healthInfo, 'health', data.health)
         this.$set(this.healthInfo, 'deathLimit', data.death_limit)
 
@@ -168,7 +167,6 @@
       this.$bus.$on('#player_disconnected', this.haltGameDisconnect)
       this.$bus.$on('#game_over', (data) => {
         this.status = GAME_OVER
-        this.gameOverText = `Good job! The public loves you. We’re a happy city.`
         this.stopSound('sounds/alarm.mp3')
         this.playSound('sounds/gameover.mp3')
       })

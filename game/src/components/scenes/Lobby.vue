@@ -117,6 +117,10 @@ export default {
       }
     })
     this.$bus.$on('#game_started', (data) => {
+      console.log("INFO: (Lobby) Game started")
+      console.log(`INFO: Setting role to ${data.role}`)
+      this.$role.set(data.role)
+      console.log(`INFO: Received new role: ${this.$role}`)
       this.inIntro = true
       this.stopBgm()
       this.playSound('sounds/game_start.mp3')

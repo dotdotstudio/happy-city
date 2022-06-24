@@ -123,7 +123,7 @@ class Game:
         # Make sure the room is not completely full
         if len(self.slots) >= self.max_players:
             await Sio().emit("game_join_fail", {
-                "message": "La partita è piena"
+                "message": "The game is full"
             }, room=client.sid)
             return
 
@@ -319,7 +319,11 @@ class Game:
             await self.next_level()
 
             # Notify all clients
-            await Sio().emit("game_started", room=self.sio_room)
+            for slot in self.slots:
+                print(f"Sending 'game_started' event to client: ${slot.client.sid}")
+                await Sio().emit("game_started", {
+                    "role": slot.role
+                }, room=slot.client.sid)
         else:
             raise RuntimeError("Conditions not met for game to start")
 
