@@ -84,6 +84,8 @@ amphitheatre,3
 food cart permit,3
 park bench,3
 rose garden,3
+aquarium,3
+zoo,3
 cherry blossoms,3
 fountain,3
 pool,3
@@ -91,7 +93,5 @@ arborist,3
 horticulturalist,3
 gardener,3
 path construction,3
-tree work permit,3
 ballpark,3
 planting permit,3
-
