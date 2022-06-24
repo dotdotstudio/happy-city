@@ -4,12 +4,16 @@ recycling,0
 landfill,0
 compost,0
 recyling truck,0
-toxic waste,0
-garbage bag,0
+toxic waste clean up,0
+household garbage,0
 water test,0
 street cleaner,0
+rat,0
+bees nest removal,0
+garbage collection,0
+subway station,1
 subway,1
-train,1
+L train,1
 bus,1
 ferry,1
 cycleway,1
@@ -17,7 +21,9 @@ bike,1
 e-bike,1
 scooter,1
 roadworks,1
-station,1
+bus lane,1
+bus station,1
+parking ticket,1
 building consent,2
 construction,2
 architect,2
