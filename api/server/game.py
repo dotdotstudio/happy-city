@@ -351,7 +351,7 @@ class Game:
         if (self.level == 0):
             print("INFO: Starting the game")
         else:
-            print(f"INFO: Advancing to level {self.level}.")
+            print(f"INFO: Advancing to level {self.level+1}.")
 
         # Reset health and death limit
         self.health = self.STARTING_HEALTH
@@ -696,7 +696,7 @@ class Game:
             await Sio().emit("next_level", {
                 "level": self.level,
                 "modifier": self.game_modifier is not None,
-                "text": self.game_modifier.DESCRIPTION if self.game_modifier is not None else "The public is happy - good job city management!."
+                "text": self.game_modifier.DESCRIPTION if self.game_modifier is not None else "The public is happy - good job city management!"
             }, room=self.sio_room)
         else:
             # This was an useful command! Force new generation outside the loop
