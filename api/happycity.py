@@ -39,7 +39,7 @@ def main():
 
     # Create sio and aiohttp server
     app = web.Application()
-    sio = Sio(cors_allowed_origins=[])
+    sio = Sio(cors_allowed_origins=[], ping_timeout=30)
     sio.attach(app)
 
     # Config server functionality (see server/__init__.py)
