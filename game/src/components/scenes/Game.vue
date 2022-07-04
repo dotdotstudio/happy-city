@@ -4,9 +4,9 @@
       <death-barrier :position='deathBarrierPosition'></death-barrier>
       <ship v-if="showShip" :left="shipLeft" :transitionSpeed="outroAnimation ? 4 : levelTransition ? 0 : 1"></ship>
       <transition name="v-fade">
+        <span v-if="!(printingWelcome || levelTransition)" class="role-header outline">{{ roleNames[$role] }}</span>
         <span class="outline" v-if="printingWelcome || levelTransition">Quarter {{ levelInfo.level }}</span>
       </transition>
-
       <transition name="v-fade">
         <span class="outline" v-if="outroAnimation">Good job!</span>
       </transition>
@@ -78,6 +78,13 @@
   export default {
     data () {
       return {
+        roleNames: [
+          "Department of Sanitation",
+          "Department of Transport",
+          "Department of Buildings",
+          "Department of Parks & Rec"
+        ],
+
         gameGrid: null,
 
         status: PRINTING_WELCOME,
@@ -347,6 +354,12 @@
     bottom: 20px;
     opacity: 0.5;
     animation: intro-ff-fade 1s forwards;
+  }
+
+  .role-header {
+    padding: 10px;
+    text-align: center;
+    width: 100%;
   }
 
   #alarm-light {

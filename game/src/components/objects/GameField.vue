@@ -6,7 +6,6 @@
     <div class="progress" v-if="!outroAnimation">
       <div ref="progress" class="progress-bar"></div>
     </div>
-    <div class="role-header">{{ roleNames[$role] }}</div>
     <div id="grid" v-if="grid !== null" :style="flipScale">
       <div class="cell"
       v-for="(command, index) in grid"
@@ -121,12 +120,6 @@
   export default {
     data () {
       return {
-        roleNames: [
-          "Department of Sanitation",
-          "Department of Transport",
-          "Department of Buildings",
-          "Department of Parks & Rec"
-        ],
         progressBar: {
           progress: 100,
           intervalTime: 25,
@@ -522,12 +515,6 @@
 
   .command-name.symbols-font {
     font-size: 250%; 
-  }
-
-  .role-header {
-    padding: 10px;
-    text-align: center;
-    background-color: #0f121a;
   }
 
   #instruction>span.symbols-font {
