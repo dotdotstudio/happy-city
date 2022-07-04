@@ -89,13 +89,22 @@ new Vue({
       this.$bus.$emit('#connected')
 
       // Set global var for client role
-      //Vue.prototype.$role = "No role assigned"
       Vue.prototype.$role = {
+        value: "No role assigned",
         set: (roleName) => {
-          Vue.prototype.$role = roleName
+          Vue.prototype.$role.value = roleName
         },
         get: () => {
-          return Vue.prototype.$role
+          return Vue.prototype.$role.value
+        }
+      }
+      Vue.prototype.$level = {
+        value: 0,
+        set: (newLevel) => {
+          Vue.prototype.$level.value = newLevel
+        },
+        get: () => {
+          return Vue.prototype.$level.value
         }
       }
     })

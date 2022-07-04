@@ -102,111 +102,101 @@ TYPES = {
     Switch: "switch"
 }
 
+layoutNames = [
+    "EMPTY",
+    "OCCUPIED",
+    "SQUARE",
+    "VERTICAL_RECTANGLE",
+    "HORIZONTAL_RECTANGLE",
+    "BIG_SQUARE",
+]
+
 
 # we will be using a y,x coordinate system;
 # so they will be looking at our grid left to right first,
 # top to bottom after that.
 class Grid:
-    def __init__(self, command_name_generator, role=0, pool_config=NORMAL):
-        self.grid = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+    def __init__(self, command_name_generator, role=0, width=4, height=4):
+        #self.grid = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+        self.width = width
+        self.height = height
+        self.grid = []
+        for y in range(self.height):
+            self.grid.append([])
+            for x in range(self.width):
+                self.grid[y].append(0)
+        print(f"WIDTH: {self.width} HEIGHT: {self.height}")
         self.objects = []
         self.command_name_generator = command_name_generator
         self.role = role
+        self.level = 0
 
-        while True:
-            #print(self.grid)
-            y, x = self.get_next_empty()
-            if y < 0 and x < 0:
-                break
-            #print("next empties are: %s, %s" % (y, x))
-            success = self.add_random_element(y, x)
-            if success == False:
-                print("ERROR: No more words to use. Breaking out of tile creation.")
-                break # It means there are no more words to use.
-
-    def get_next_empty(self):
-        for y in range(4):
-            for x in range(4):
-                if self.grid[y][x] == layout_cells.EMPTY:
-                    return y, x
-        return -1, -1
+        for y in range(self.height):
+            for x in range(self.width):
+                if self.grid[y][x] != layout_cells.EMPTY:
+                    continue
+                success = self.add_random_element(y, x)
+                if success == False:
+                    print("ERROR: No more words to use. Breaking out of tile creation.")
+                    return # It means there are no more words to use.
 
     def add_random_element(self, y, x):
-        fsr = self.free_space_right(y, x)
-
-        #print("for %s, %s; there's %s spaces to the right." % (y, x, fsr))
-
-        if fsr == 1:
-            # No space left on x axis, only Squares and VerticalRectangles allowed
-            pool = [layout_cells.SQUARE, layout_cells.VERTICAL_RECTANGLE]
-        else:
-            # More space, everything can fit
-            pool = [
-                layout_cells.SQUARE, layout_cells.VERTICAL_RECTANGLE,
-                layout_cells.HORIZONTAL_RECTANGLE, layout_cells.BIG_SQUARE
-            ]
-
-        # Remove elements already present in that row
-        # for element in self.grid[y]:
-        #     pool = list(filter(lambda z: z != element, pool))
-
-        if y == 3:
-            # No space left on y axis, remove VerticalRectangles and BigSquares from pool
-            pool = list(filter(lambda z: z not in [layout_cells.VERTICAL_RECTANGLE, layout_cells.BIG_SQUARE], pool))
 
         # Default size is 1
-        length = 1
+        size = 1
 
-        # pick something from the pool, or if nothing's left pick a square
+        pool = [layout_cells.SQUARE]
+        spaces_right = self.get_spaces_right(y, x)
+        spaces_down = self.get_spaces_down(y, x)
+
+        if spaces_right > 0:
+            pool.append(layout_cells.HORIZONTAL_RECTANGLE)
+        if spaces_down > 0:
+            pool.append(layout_cells.VERTICAL_RECTANGLE)
+        if (spaces_right > 0) and (spaces_down > 0):
+            pool.append(layout_cells.BIG_SQUARE)
+
+        # Select random block
         _type = random.choice(pool) if len(pool) != 0 else layout_cells.SQUARE
-        #print("we picked to insert a type %s object there" % _type)
 
-        # if fsr is > 2 and you picked a horizontalrectangle, decide how long it will be.
-        if _type == layout_cells.HORIZONTAL_RECTANGLE:
-            if fsr > 2:
-                length = random.randint(2, 3)
-            else:
-                length = 2
+        print(f"INFO: Placing {layoutNames[_type]} at {x}, {y}")
+        
 
-        # if you picked a verticalrectangle, decide how long it will be.
-        if _type == layout_cells.VERTICAL_RECTANGLE:
-            if y <= 1:
-                length = random.randint(2, 3)
-            else:
-                length = 2
+        if _type == layout_cells.HORIZONTAL_RECTANGLE or _type == layout_cells.BIG_SQUARE:
+            if (self.level == 0):
+                size = 2
+            else: size = random.randint(2, self.width-1 - x)
 
-        # if you picked a bigsquare, decide how big it will be.
-        if _type == layout_cells.BIG_SQUARE:
-            # if y <= 1 and fsr >= 1 and x <= 1:
-            #     length = random.randint(2, 3)
-            # else:
-            #     length = 2
-            length = 2
+        elif _type == layout_cells.VERTICAL_RECTANGLE:
+            if (self.level == 0):
+                size = 2
+            else: size = random.randint(2, self.height-1 - y)
 
-        #print("and the length will be %s" % length)
-
-        # insert the object
-        success = self.insert_object(y, x, _type, length)
+        # Add the block
+        success = self.insert_object(y, x, _type, size)
         return success
 
-    def insert_object(self, y, x, _type, length):
-        #print("inserting a _type %s object of length %s to %s, %s" % (_type, length, y, x))
+    def insert_object(self, y, x, _type, size):
 
-        # Only the
         self.grid[y][x] = _type
 
-        if length != 1:
+        print(self.grid)
+
+        if size != 1:
             if _type == layout_cells.VERTICAL_RECTANGLE:
-                for i in range(y + 1, y + length):
+                print("Adding v rect")
+                for i in range(y + 1, y + size):
                     self.grid[i][x] = layout_cells.OCCUPIED
             elif _type == layout_cells.HORIZONTAL_RECTANGLE:
-                for i in range(x + 1, x + length):
+                print("Adding h rect")
+                for i in range(x + 1, x + size):
                     self.grid[y][i] = layout_cells.OCCUPIED
             elif _type == layout_cells.BIG_SQUARE:
+                print("Adding big square")
                 self.grid[y + 1][x] = layout_cells.BIG_SQUARE
                 self.grid[y][x + 1] = layout_cells.BIG_SQUARE
                 self.grid[y + 1][x + 1] = layout_cells.BIG_SQUARE
-                if length == 3:
+                if size == 3:
                     for i in range(3):
                         self.grid[y + 2][x + i] = layout_cells.BIG_SQUARE
                     for i in range(3):
@@ -216,7 +206,7 @@ class Grid:
         if _type in [layout_cells.SQUARE, layout_cells.BIG_SQUARE]:
             pool.append(Button)
             pool.append(Switch)
-        if _type == layout_cells.VERTICAL_RECTANGLE and length == 2:
+        if _type == layout_cells.VERTICAL_RECTANGLE and size == 2:
             for _ in range(2):
                 pool.append(Actions)
         if _type in [layout_cells.VERTICAL_RECTANGLE, layout_cells.HORIZONTAL_RECTANGLE]:
@@ -241,15 +231,15 @@ class Grid:
         if _type == layout_cells.VERTICAL_RECTANGLE:
             # Special size for vertical rectangle
             init_kwargs["w"] = 1
-            init_kwargs["h"] = length
+            init_kwargs["h"] = size
         elif _type == layout_cells.HORIZONTAL_RECTANGLE:
             # Special size for horizontal rectangle
-            init_kwargs["w"] = length
+            init_kwargs["w"] = size
             init_kwargs["h"] = 1
         elif _type == layout_cells.BIG_SQUARE:
             # Special size for big square rectangle
-            init_kwargs["w"] = length
-            init_kwargs["h"] = length
+            init_kwargs["w"] = size
+            init_kwargs["h"] = size
 
         if _object in [Slider, ButtonsSlider]:
             # Special kwargs for Sliders
@@ -277,13 +267,21 @@ class Grid:
         return True
 
 
-    def free_space_right(self, y, x):
-        cnt = 0
-        for i in range(x, 4):
+    def get_spaces_right(self, y, x):
+        count = 0
+        for i in range(x+1, self.width):
             if self.grid[y][i] != layout_cells.EMPTY:
-                return cnt
-            cnt += 1
-        return cnt
+                return count
+            count += 1
+        return count
+
+    def get_spaces_down(self, y, x):
+        count = 0
+        for i in range(y+1, self.height):
+            if self.grid[i][x] != layout_cells.EMPTY:
+                return count
+            count += 1
+        return count
 
     def jsonify(self):
         return json.dumps(self.objects, cls=GridJSONEncoder)

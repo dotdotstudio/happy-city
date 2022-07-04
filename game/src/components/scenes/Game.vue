@@ -4,7 +4,7 @@
       <death-barrier :position='deathBarrierPosition'></death-barrier>
       <ship v-if="showShip" :left="shipLeft" :transitionSpeed="outroAnimation ? 4 : levelTransition ? 0 : 1"></ship>
       <transition name="v-fade">
-        <span v-if="!(printingWelcome || levelTransition)" class="role-header outline">{{ roleNames[$role] }}</span>
+        <span v-if="!(printingWelcome || levelTransition || outroAnimation)" class="role-header outline">{{ roleNames[$role.get()] }}</span>
         <span class="outline" v-if="printingWelcome || levelTransition">Quarter {{ levelInfo.level }}</span>
       </transition>
       <transition name="v-fade">
@@ -136,6 +136,9 @@
         this.gameGrid = null
 
         this.status = PRINTING_WELCOME
+
+        this.$level.set(1) // Update global level
+        console.log(`INFO: Set level to ${this.$level.get()}`)
       })
 
       this.$bus.$on('#grid', (data) => {
@@ -164,7 +167,9 @@
         this.status = OUTRO_ANIMATION
       
         // Set level and modifier
-        this.levelInfo.level = data.level + 1
+        const nextLevel = data.level + 1
+        this.levelInfo.level = nextLevel
+        this.$level.set(nextLevel) // Update global level
         if (data.hasOwnProperty('modifier')) {
           this.levelInfo.modifier = data.modifier
         } else {

@@ -405,14 +405,20 @@ class Game:
         if self.game_modifier is not None:
             self.difficulty = self.game_modifier.difficulty_post_processor(self.difficulty)
 
+        # Set size of grid
+        self.gridSize= self.level + 2 # +1 for zero-index and +1 so that level 1 == 2x2 grid
+        
+        # Note: This could easily support uneven grids, just would need to specify on backend
+        # here, and on client-side would need to specify at GameField.vue @ gridStyle.
+
         # Generate grids
-        await self.generate_grids()
+        await self.generate_grids(self.gridSize, self.gridSize)
 
         # Start game modifier task if needed
         if self.game_modifier is not None:
             self.game_modifier_task = asyncio.Task(self.game_modifier.task())
 
-    async def generate_grids(self):
+    async def generate_grids(self, width, height):
         """
         Generates new `Grid`s for all clients
         :return:
@@ -422,7 +428,7 @@ class Game:
         name_generator = CommandNameGenerator()
 
         for slot in self.slots:
-            g = Grid(name_generator, slot.role)
+            g = Grid(name_generator, slot.role, width=width, height=height)
 
             # Game modifier post processor if needed
             if self.game_modifier is not None:

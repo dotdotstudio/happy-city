@@ -6,7 +6,7 @@
     <div class="progress" v-if="!outroAnimation">
       <div ref="progress" class="progress-bar"></div>
     </div>
-    <div id="grid" v-if="grid !== null" :style="flipScale">
+    <div id="grid" :style="gridStyle" v-if="grid !== null">
       <div class="cell"
       v-for="(command, index) in grid"
       v-if="!nullCellAnimation"
@@ -373,17 +373,16 @@
           }, 4500)
         })
       },
-      // status: {
-      //   handler () {
-      //     console.log('becco wo')
-      //   },
-      //   deep: true
-      // }
     },
     computed: {
-      flipScale() {
+      gridStyle() {
+        const level = this.$level.get()
+        const gridSize = level+1 // This level value is already 1-indexed, so +1 so that level 1 == 2x2 grid
+        console.log(`INFO: Setting grid to size ${gridSize}`)
         return {
-          transform: 'scaleX(' + this.gridScaleX + ')'
+          "grid-template-columns": `repeat(${gridSize}, 1fr)`,
+          "grid-template-rows": `repeat(${gridSize}, 1fr)`,
+          "transform": `scaleX('${this.gridScaleX})`
         }
       }
     },
@@ -430,8 +429,6 @@
     background-color: #0f121a;
 
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 1fr);
     grid-gap: 10px;
     padding: 0px 10px 10px 10px;
 
