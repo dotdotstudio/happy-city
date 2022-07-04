@@ -406,7 +406,8 @@ class Game:
             self.difficulty = self.game_modifier.difficulty_post_processor(self.difficulty)
 
         # Set size of grid
-        self.gridSize= self.level + 2 # +1 for zero-index and +1 so that level 1 == 2x2 grid
+        displayLevel = self.level+1 # +1 to convert zero-index level to what we would see on game client
+        self.gridSize = displayLevel + 1 # +1 so that level 1 == 2x2 grid
         
         # Note: This could easily support uneven grids, just would need to specify on backend
         # here, and on client-side would need to specify at GameField.vue @ gridStyle.
