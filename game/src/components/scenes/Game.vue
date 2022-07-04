@@ -113,6 +113,21 @@
         this.inIntro = true
         this.stopBgm()
         this.playSound('sounds/game_start.mp3')
+
+        // Reset state
+        this.healthInfo.health = 50
+        this.healthInfo.deathLimit = 0
+
+        this.showShip = true
+        this.showAlarm = false
+        this.showSafe = false
+
+        this.levelInfo.level = 1
+        this.levelInfo.modifer = null
+        this.levelInfo.modifierText = ''
+
+        this.gameGrid = null
+
         this.status = PRINTING_WELCOME
       })
 
@@ -193,11 +208,6 @@
       },
       restartGame ()
       {
-        // Reset health and death barrier
-        this.healthInfo.health = 50
-        this.healthInfo.deathLimit = 0
-        this.showAlarm = false
-
         // Emit start game
         this.$io.emit("start_game")
       },
