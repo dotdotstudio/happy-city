@@ -74,7 +74,6 @@
           :processStyle='{
             "backgroundColor": "#02bd7d"
           }'
-          :style="flipScale"
         ></vue-slider>
         <circle-slider
           v-else-if="command.type === 'circular_slider'"
@@ -87,7 +86,6 @@
           :min="command.min"
           :max="command.max * 10"
           :side="150"
-          :style="flipScale"
         ></circle-slider>
         <div v-else-if="command.type === 'buttons_slider'" style="display: flex;">
           <push-button
