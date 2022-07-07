@@ -5,7 +5,7 @@
       <ship v-if="showShip" :left="shipLeft" :transitionSpeed="outroAnimation ? 4 : levelTransition ? 0 : 1"></ship>
       <transition name="v-fade">
         <span v-if="!(printingWelcome || levelTransition || outroAnimation)" class="role-header outline">{{ roleNames[$role.get()] }}</span>
-        <span class="outline" v-if="printingWelcome || levelTransition">Quarter {{ levelInfo.level }}</span>
+        <span class="outline" v-if="printingWelcome || levelTransition">Quarter {{ levelInfo.level+1 }}</span>
       </transition>
       <transition name="v-fade">
         <span class="outline" v-if="outroAnimation">Good job!</span>
@@ -99,7 +99,7 @@
         showSafe: false,
 
         levelInfo: {
-          level: 1,
+          level: 0,
           modifier: null,
           modifierText: ''
         }
@@ -167,9 +167,8 @@
         this.status = OUTRO_ANIMATION
       
         // Set level and modifier
-        const nextLevel = data.level + 1
-        this.levelInfo.level = nextLevel
-        this.$level.set(nextLevel) // Update global level
+        this.levelInfo.level = data.level
+        this.$level.set(data.level) // Update global level
         console.log(`INFO: Progressing to level ${this.$level.get()}`)
         if (data.hasOwnProperty('modifier')) {
           this.levelInfo.modifier = data.modifier
