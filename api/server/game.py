@@ -540,19 +540,29 @@ class Game:
 
         # Generate a command if needed
         if command is None:
-            # Find a random command that is not used in any other instructions at the moment and is not the same as the
-            # previous one
-            valid_command = False
-            while not valid_command:
-                valid_command = True
+            print("Generating command...")
+            # Find a random command that is not used in any other instructions at the moment
+            # and is not the same as the previous one - unless there is only one instruction.
+            found_valid_command = False
+            for _ in target.grid.objects:
+                if (found_valid_command): break
+
+                # Pick a random instruction.
                 command = random.choice(target.grid.objects)
-                #print(self.instructions + [slot.instruction])
-                #print(slot.instruction)
-                for x in self.instructions + [slot.instruction]:
-                    # x is `None` if slot.instructions is None (first generation)
-                    if x is not None and x.target_command == command:
-                        valid_command = False
+
+                # Search current instructions to see if that was a valid command (i.e. not in use).
+                found_valid_command = True
+                currentInstructions = self.instructions # This may be None according to old documentation.
+                if slot.instruction is not None: currentInstructions.append(slot.instruction)
+                for _instruction in currentInstructions:
+                    if (_instruction.target_command == command):
+                        # We selected a dud instruction, pick another one.
+                        found_valid_command = False
                         break
+
+            if not found_valid_command:
+                # It means the only available instructions are all in use.
+                command = random.choice(target.grid.objects)
 
         # Set this slot's instruction and notify the client
         slot.instruction = Instruction(slot, target, command)
