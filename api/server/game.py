@@ -428,7 +428,7 @@ class Game:
         name_generator = CommandNameGenerator()
 
         for slot in self.slots:
-            g = Grid(name_generator, slot.role, width=width, height=height)
+            g = Grid(name_generator, slot.role, width=width, height=height, level=self.level)
 
             # Game modifier post processor if needed
             if self.game_modifier is not None:

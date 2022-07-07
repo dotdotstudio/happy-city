@@ -117,11 +117,11 @@ layoutNames = [
 # so they will be looking at our grid left to right first,
 # top to bottom after that.
 class Grid:
-    def __init__(self, command_name_generator, role=0, width=4, height=4):
-        #self.grid = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+    def __init__(self, command_name_generator, role=0, width=4, height=4, level=0):
         self.width = width
         self.height = height
         self.grid = []
+        self.level = level
         for y in range(self.height):
             self.grid.append([])
             for x in range(self.width):
@@ -130,10 +130,10 @@ class Grid:
         self.objects = []
         self.command_name_generator = command_name_generator
         self.role = role
-        self.level = 0
 
         for y in range(self.height):
             for x in range(self.width):
+                # print(f"DEBUG: Adding random element to cell #{x},{y}")
                 if self.grid[y][x] != layout_cells.EMPTY:
                     continue
                 success = self.add_random_element(y, x)
@@ -154,7 +154,16 @@ class Grid:
             pool.append(layout_cells.HORIZONTAL_RECTANGLE)
         if spaces_down > 0:
             pool.append(layout_cells.VERTICAL_RECTANGLE)
-        if (spaces_right > 0) and (spaces_down > 0):
+        if (spaces_right > 0) and (spaces_down > 0) and (self.level > 1):
+            # Due to the way we're handling the difficulty curve,
+            # levels 1 and 2 have 2x2 grids. For these levels, we don't
+            # want big squares, otherwise it's too easy.
+            # But then for level 3, we actually want a higher likelihood
+            # of getting a big square, because the jump from 2x2 to 3x3
+            # is a little big.
+            # Keep in mind that self.level is zero-indexed.
+            if self.level == 2:
+                pool.append(layout_cells.BIG_SQUARE) # Twice the chance of a big square on level 3.
             pool.append(layout_cells.BIG_SQUARE)
 
         # Select random block
@@ -162,16 +171,11 @@ class Grid:
 
         # print(f"DEBUG: Placing {layoutNames[_type]} at {x}, {y}")
         
-
-        if _type == layout_cells.HORIZONTAL_RECTANGLE or _type == layout_cells.BIG_SQUARE:
-            if (self.level == 0):
-                size = 2
-            else: size = random.randint(2, self.width-1 - x)
-
-        elif _type == layout_cells.VERTICAL_RECTANGLE:
-            if (self.level == 0):
-                size = 2
-            else: size = random.randint(2, self.height-1 - y)
+        # Change this to change:
+        #   -   how wide the horizontal blocks are,
+        #   -   how tall the vertical blocks are, and
+        #   -   how big the big squares are.
+        size = 2 # You could even set this dependant on the level.
 
         # Add the block
         success = self.insert_object(y, x, _type, size)
