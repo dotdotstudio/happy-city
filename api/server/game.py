@@ -407,6 +407,7 @@ class Game:
 
         # Set size of grid
         self.gridSize = int(self.level/2+1) +1 # /2 +1 so that level 1 == 2x2 grid, level 2 == 2x2, level 3 == 3x3, etc.
+        self.gridSize = min(self.gridSize, 4) # Clamp to maximum 4x4 grid size to prevent screen size issues.
         
         # Note: This could easily support uneven grids, just would need to specify on backend
         # here, and on client-side would need to specify at GameField.vue @ gridStyle.
