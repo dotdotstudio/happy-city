@@ -102,6 +102,7 @@ TYPES = {
     Switch: "switch"
 }
 
+# This is used for debug messaging and lines up with the layout_cells enum.
 layoutNames = [
     "EMPTY",
     "OCCUPIED",
@@ -125,7 +126,7 @@ class Grid:
             self.grid.append([])
             for x in range(self.width):
                 self.grid[y].append(0)
-        print(f"WIDTH: {self.width} HEIGHT: {self.height}")
+        print(f"INFO: Creating a new {self.width}x{self.height} grid.")
         self.objects = []
         self.command_name_generator = command_name_generator
         self.role = role
@@ -159,7 +160,7 @@ class Grid:
         # Select random block
         _type = random.choice(pool) if len(pool) != 0 else layout_cells.SQUARE
 
-        print(f"INFO: Placing {layoutNames[_type]} at {x}, {y}")
+        # print(f"DEBUG: Placing {layoutNames[_type]} at {x}, {y}")
         
 
         if _type == layout_cells.HORIZONTAL_RECTANGLE or _type == layout_cells.BIG_SQUARE:
@@ -180,19 +181,14 @@ class Grid:
 
         self.grid[y][x] = _type
 
-        print(self.grid)
-
         if size != 1:
             if _type == layout_cells.VERTICAL_RECTANGLE:
-                print("Adding v rect")
                 for i in range(y + 1, y + size):
                     self.grid[i][x] = layout_cells.OCCUPIED
             elif _type == layout_cells.HORIZONTAL_RECTANGLE:
-                print("Adding h rect")
                 for i in range(x + 1, x + size):
                     self.grid[y][i] = layout_cells.OCCUPIED
             elif _type == layout_cells.BIG_SQUARE:
-                print("Adding big square")
                 self.grid[y + 1][x] = layout_cells.BIG_SQUARE
                 self.grid[y][x + 1] = layout_cells.BIG_SQUARE
                 self.grid[y + 1][x + 1] = layout_cells.BIG_SQUARE

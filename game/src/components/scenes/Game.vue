@@ -137,8 +137,8 @@
 
         this.status = PRINTING_WELCOME
 
-        this.$level.set(1) // Update global level
-        console.log(`INFO: Set level to ${this.$level.get()}`)
+        this.$level.set(0) // Update global level
+        //console.log(`DEBUG: Set level to ${this.$level.get()}`)
       })
 
       this.$bus.$on('#grid', (data) => {
@@ -170,6 +170,7 @@
         const nextLevel = data.level + 1
         this.levelInfo.level = nextLevel
         this.$level.set(nextLevel) // Update global level
+        console.log(`INFO: Progressing to level ${this.$level.get()}`)
         if (data.hasOwnProperty('modifier')) {
           this.levelInfo.modifier = data.modifier
         } else {

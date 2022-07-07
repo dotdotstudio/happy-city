@@ -376,8 +376,8 @@
     },
     computed: {
       gridStyle() {
-        const level = this.$level.get()
-        const gridSize = level+1 // This level value is already 1-indexed, so +1 so that level 1 == 2x2 grid
+        const level = this.$level.get() // Zero-indexed
+        const gridSize = Math.floor(level/2+1)+1 // /2 +1 so that level 1 == 2x2 grid, level 2 == 2x2, level 3 == 3x3, etc.
         console.log(`INFO: Setting grid to size ${gridSize}`)
         return {
           "grid-template-columns": `repeat(${gridSize}, 1fr)`,

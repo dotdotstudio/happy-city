@@ -121,8 +121,7 @@ export default {
       console.log(`INFO: Setting role to ${data.role}`)
       this.$role.set(data.role)
       console.log(`INFO: Received new role: ${this.$role.get()}`)
-      this.$level.set(1) // Update global level
-      console.log(`INFO: Set level to ${this.$level.get()}`)
+      this.$level.set(0) // Update global level
       this.inIntro = true
       this.stopBgm()
       this.playSound('sounds/game_start.mp3')
