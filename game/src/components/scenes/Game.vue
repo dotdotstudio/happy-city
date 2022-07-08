@@ -129,7 +129,7 @@
         this.showAlarm = false
         this.showSafe = false
 
-        this.levelInfo.level = 1
+        this.levelInfo.level = 0
         this.levelInfo.modifer = null
         this.levelInfo.modifierText = ''
 
