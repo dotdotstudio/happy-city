@@ -21,6 +21,8 @@ class Slot:
         self.host = host
         self.role = role
 
+        self.has_completed_special_action = False
+
         self.grid = None
         self.instruction = None
         self.next_generation_task = None
@@ -73,6 +75,8 @@ class Game:
         self.previous_game_modifier = None
         self.game_modifier = None
         self.game_modifier_task = None
+        self.special_action = None
+        self.special_actions = []
 
         self.difficulty = {
             "instructions_time": 25,                        # seconds to complete an instruction
@@ -386,24 +390,13 @@ class Game:
             self.difficulty["game_modifier_chance"] = min(1.0, self.difficulty["game_modifier_chance"] + 0.25)
             logging.debug("Current difficulty: {}".format(self.difficulty))
 
-            # Game modifiers
-            #if random.random() < self.difficulty["game_modifier_chance"]:
-            #   self.previous_game_modifier = self.game_modifier
-            #    cls = random.choice(
-            #        list(filter(
-            #            lambda x: x != self.previous_game_modifier,
-            #            [Symbols]
-            #        ))
-            #    )
-            #    self.game_modifier = cls(self)
-
         # Set all `intro done` to false
         for i in self.slots:
             i.intro_done = False
 
         # Game modifier difficulty change
-        if self.game_modifier is not None:
-            self.difficulty = self.game_modifier.difficulty_post_processor(self.difficulty)
+        #if self.game_modifier is not None:
+        #    self.difficulty = self.game_modifier.difficulty_post_processor(self.difficulty)
 
         # Set size of grid
         self.gridSize = int(self.level/2+1) +1 # /2 +1 so that level 1 == 2x2 grid, level 2 == 2x2, level 3 == 3x3, etc.
@@ -416,8 +409,65 @@ class Game:
         await self.generate_grids(self.gridSize, self.gridSize)
 
         # Start game modifier task if needed
-        if self.game_modifier is not None:
-            self.game_modifier_task = asyncio.Task(self.game_modifier.task())
+        #if self.game_modifier is not None:
+        #    self.game_modifier_task = asyncio.Task(self.game_modifier.task())
+
+        # Game modifiers
+        self.previous_game_modifier = self.game_modifier
+        self.special_actions = ["Macy's Parade", "4th of July Fireworks", "Vote", "Bagel"]
+        rand_objects = {
+            "Macy's Parade": Actions,
+            "4th of July Fireworks": Actions,
+            "Vote": Actions,
+            "Bagel": Actions
+        }
+        rand_actions = {
+            "Macy's Parade": ["Attend"],
+            "4th of July Fireworks": ["Watch"],
+            "Vote": ["Submit"],
+            "Bagel": ["Eat"]
+        }
+        print("[Game] Selecting game modifier...")
+        if (len(self.special_actions) > 0):
+            rand_object_name = random.choice(
+                list(filter(
+                    lambda x: x != self.previous_game_modifier, self.special_actions
+                ))
+            )
+            self.game_modifier = rand_object_name
+        else:
+            rand_object_name = self.special_actions[0]
+            
+        print(f"[Game] Selected `{rand_object_name}`.")
+
+        min_time = self.difficulty["instructions_time"]
+        max_time_duration = min_time * 1
+        #rand_time = min_time + (random.random() * max_time_duration)
+        rand_time = 10 + (15 * random.random())
+        for slot in self.slots:
+            # Pick a random object to replace
+            objects = slot.grid.objects
+            index = random.randrange(0, len(objects)-1)
+            old_object = objects[index]
+
+            # Configure Button object
+            new_object = rand_objects[rand_object_name](
+                name=rand_object_name,
+                x=old_object.x,
+                y=old_object.y,
+                w=old_object.w,
+                h=old_object.h,
+                actions=rand_actions[rand_object_name]
+            )
+
+            print(f"ind={index} x={new_object.x} y={new_object.y} w={new_object.w} h={new_object.h}")
+
+            # Replace old with new
+            slot.grid.objects[index] = new_object
+
+            # Schedule instruction
+            print(f"[Game] Scheduled special task for slot {slot.client.sid} in {rand_time} seconds.")
+            slot.next_generation_task = asyncio.Task(self.schedule_generation(slot, rand_time, expired=None, stop_old_task=True, command=new_object))
 
     async def generate_grids(self, width, height):
         """
@@ -432,11 +482,11 @@ class Game:
             g = Grid(name_generator, slot.role, width=width, height=height, level=self.level)
 
             # Game modifier post processor if needed
-            if self.game_modifier is not None:
-                try:
-                    self.game_modifier.grid_post_processor(g)
-                except NotImplementedError:
-                    pass
+            #if self.game_modifier is not None:
+            #    try:
+            #        self.game_modifier.grid_post_processor(g)
+            #    except NotImplementedError:
+            #        pass
 
             slot.grid = g
 
@@ -484,12 +534,12 @@ class Game:
 
         # Generate first command for each slot, starting the regeneration loop as well
         for slot in self.slots:
-            await self.generate_instruction(slot)
+            await self.generate_instruction(slot, stop_old_task=False)
 
         # Star the health drain task too
         self.health_drain_task = asyncio.Task(self.health_drain_loop())
 
-    async def generate_instruction(self, slot, expired=None, stop_old_task=True):
+    async def generate_instruction(self, slot, expired=None, stop_old_task=True, command=None):
         """
         Generates and sets a valid and unique Instruction for `Slot` and schedules
         an asyncio Task to run
@@ -508,32 +558,38 @@ class Game:
             slot.next_generation_task.cancel()
         old_instruction = slot.instruction
 
+        #print(f"generate_instruction(slot={slot.client.sid}, expired={expired}, stop_old_task={stop_old_task}, command={command.name if command else command})")
+
+        target = random.choice(list(filter(lambda z: z != slot, self.slots)))
+
+        self.special_action = command.name if command else None
+
         # Choose between an asteroid/black hole or normal command
-        command = None
-        if random.random() < self.difficulty["asteroid_chance"] and slot.special_command_cooldown <= 0:
-            # Asteroid, force target and command
-            target = None
-            command = DummyAsteroidCommand()
-            slot.special_command_cooldown = self.difficulty["special_command_cooldown"] + 1
-        elif random.random() < self.difficulty["black_hole_chance"] and slot.special_command_cooldown <= 0:
-            # Black hole, force target and command
-            target = None
-            command = DummyBlackHoleCommand()
-            slot.special_command_cooldown = self.difficulty["special_command_cooldown"] + 1
-        elif Config()["SINGLE_PLAYER"]:
-            # Single player debug mode, force target only
-            target = slot
-        else:
-            # Normal, choose a target
-            # Choose a random slot and a random command.
-            # We don't do this in `Instruction` because we need to access
-            # match's properties and passing match and next_levelinstruction to `Instruction` is not elegant imo
-            if random.randint(0, 5) == 0:
-                # 1/5 chance of getting a command in our grid
+        if command is None:
+            if random.random() < self.difficulty["asteroid_chance"] and slot.special_command_cooldown <= 0:
+                # Asteroid, force target and command
+                target = None
+                command = DummyAsteroidCommand()
+                slot.special_command_cooldown = self.difficulty["special_command_cooldown"] + 1
+            elif random.random() < self.difficulty["black_hole_chance"] and slot.special_command_cooldown <= 0:
+                # Black hole, force target and command
+                target = None
+                command = DummyBlackHoleCommand()
+                slot.special_command_cooldown = self.difficulty["special_command_cooldown"] + 1
+            elif Config()["SINGLE_PLAYER"]:
+                # Single player debug mode, force target only
                 target = slot
             else:
-                # Filter out our slot and chose another one randomly
-                target = random.choice(list(filter(lambda z: z != slot, self.slots)))
+                # Normal, choose a target
+                # Choose a random slot and a random command.
+                # We don't do this in `Instruction` because we need to access
+                # match's properties and passing match and next_levelinstruction to `Instruction` is not elegant imo
+                if random.randint(0, 5) == 0:
+                    # 1/5 chance of getting a command in our grid
+                    target = slot
+                else:
+                    # Filter out our slot and chose another one randomly
+                    target = random.choice(list(filter(lambda z: z != slot, self.slots)))
 
         # Decrease special command cooldown
         slot.special_command_cooldown = max(0, slot.special_command_cooldown - 1)
@@ -541,7 +597,7 @@ class Game:
 
         # Generate a command if needed
         if command is None:
-            print("Generating command...")
+            #print("Generating command...")
             # Find a random command that is not used in any other instructions at the moment
             # and is not the same as the previous one - unless there is only one instruction.
             found_valid_command = False
@@ -549,7 +605,16 @@ class Game:
                 if (found_valid_command): break
 
                 # Pick a random instruction.
-                command = random.choice(target.grid.objects)
+                options = []
+                debug_names = []
+                for object in target.grid.objects:
+                    if object.name in self.special_actions:
+                        continue
+                    else:
+                        options.append(object)
+                        debug_names.append(object.name)
+
+                command = random.choice(options)
 
                 # Search current instructions to see if that was a valid command (i.e. not in use).
                 found_valid_command = True
@@ -563,10 +628,13 @@ class Game:
 
             if not found_valid_command:
                 # It means the only available instructions are all in use.
-                command = random.choice(target.grid.objects)
+                command = random.choice(options)
 
+            #print(debug_names)
+            print(f"Generated {command.name}")
+            
         # Set this slot's instruction and notify the client
-        slot.instruction = Instruction(slot, target, command)
+        slot.instruction = Instruction(slot, target, command, special_action=True if self.special_action else False)
 
         # Add new one
         self.instructions.append(slot.instruction)
@@ -584,7 +652,7 @@ class Game:
         # Schedule a new generation
         slot.next_generation_task = asyncio.Task(self.schedule_generation(slot, self.difficulty["instructions_time"]))
 
-    async def schedule_generation(self, slot, seconds):
+    async def schedule_generation(self, slot, seconds, expired=True, stop_old_task=False, command=None):
         """
         Executes a new instruction generation for `slot` after `seconds` have passed
         :param slot: `Slot` object that will receive the `Instruction`
@@ -592,6 +660,8 @@ class Game:
         :return:
         """
         await asyncio.sleep(seconds)
+
+        #print(f"schedule_generation(slot={slot.client.sid}, seconds={seconds}, expired={expired}, command={command.name if command else command})")
 
         # Remove expired instruction
         if slot.instruction in self.instructions:
@@ -601,7 +671,7 @@ class Game:
         self.health -= self.difficulty["expired_command_health_decrease"]
 
         # Generate a new instruction
-        await self.generate_instruction(slot, expired=True, stop_old_task=False)  # if True, it would stop itself :|
+        await self.generate_instruction(slot, expired=expired, stop_old_task=stop_old_task, command=command)
 
     async def health_drain_loop(self):
         while True:
@@ -688,7 +758,8 @@ class Game:
         instruction_completed = None
         for instruction in self.instructions:
             if issubclass(type(instruction.target_command), GridElement) \
-                    and instruction.target_command.name == command_name and instruction.value == value:
+                    and instruction.target_command.name == command_name and instruction.value == value \
+                        and instruction.source.has_completed_special_action is False:
                 instruction_completed = instruction
 
         if instruction_completed is None:
@@ -700,6 +771,48 @@ class Game:
         await self.complete_instruction(instruction_completed)
 
     async def complete_instruction(self, instruction_completed, increase_health=True):
+
+        if self.special_action is not None:
+            all_completed = True
+            #print("Checking for special actions...")
+            for slot in self.slots:
+                if slot is instruction_completed.source:
+                    continue
+                if slot.has_completed_special_action is False:
+                    all_completed = False
+                    break
+            if all_completed:
+                #print("special actions all completed")
+
+                # Reset special actions
+                for slot in self.slots:
+                    slot.has_completed_special_action = False
+
+                # Remove all instructions
+                self.instructions = []
+
+                # Increase health if needed
+                if increase_health:
+                    self.health += self.difficulty["completed_instruction_health_increase"]
+
+                # Broadcast new health or next level
+                if self.health >= 100:
+                    await self.next_level()
+                    await Sio().emit("next_level", {
+                        "level": self.level,
+                        #"modifier": self.game_modifier is not None,
+                        #"text": self.game_modifier.DESCRIPTION if self.game_modifier is not None else "The public is happy - good job city management!"
+                    }, room=self.sio_room)
+                else:
+                    # This was an useful command! Force new generation outside the loop
+                    for slot in self.slots:
+                        await self.generate_instruction(slot, expired=False, stop_old_task=True)
+                    await self.notify_health()
+            else:
+                instruction_completed.source.has_completed_special_action = True
+                print(f"Setting SID {instruction_completed.source.client.sid} to {instruction_completed.source.has_completed_special_action}")
+                return
+
         # Remove old instruction
         self.instructions.remove(instruction_completed)
 
@@ -712,8 +825,8 @@ class Game:
             await self.next_level()
             await Sio().emit("next_level", {
                 "level": self.level,
-                "modifier": self.game_modifier is not None,
-                "text": self.game_modifier.DESCRIPTION if self.game_modifier is not None else "The public is happy - good job city management!"
+                #"modifier": self.game_modifier is not None,
+                #"text": self.game_modifier.DESCRIPTION if self.game_modifier is not None else "The public is happy - good job city management!"
             }, room=self.sio_room)
         else:
             # This was an useful command! Force new generation outside the loop

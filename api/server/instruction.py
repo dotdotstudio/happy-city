@@ -6,7 +6,8 @@ from utils.special_commands import DummyBlackHoleCommand, DummyAsteroidCommand, 
 
 
 class Instruction:
-    def __init__(self, source, target, target_command):
+    def __init__(self, source, target, target_command, special_action=False):
+        self.special_action = special_action
         self.source = source
         self.target = target
         self.target_command = target_command
@@ -84,4 +85,6 @@ class Instruction:
         else:
             name = ""
         s = sentence.format(name=name, value=self.value.capitalize() if type(self.value) is str else self.value)
+        if self.special_action:
+            s = "EVERYONE: "+s
         return s
