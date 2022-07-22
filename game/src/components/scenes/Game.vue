@@ -57,10 +57,10 @@
           <span><icon name="reply"></icon></span>
           Play Again
         </push-button>
-        <push-button class="orange space-font-mono" narrow @click="goToMenu()">
+        <!-- <push-button class="orange space-font-mono" narrow @click="goToMenu()">
           <span><icon name="frown-o"></icon></span>
           Exit
-        </push-button>
+        </push-button>-->
       </div>
     </div>
   </div>
