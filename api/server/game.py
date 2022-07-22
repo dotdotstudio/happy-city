@@ -414,18 +414,20 @@ class Game:
 
         # Game modifiers
         self.previous_game_modifier = self.game_modifier
-        self.special_actions = ["Macy's Parade", "4th of July Fireworks", "Vote", "Bagel"]
+        self.special_actions = ["Macy's Parade", "4th of July Fireworks", "Vote", "Bagel", "A Slice of Pizza"]
         rand_objects = {
             "Macy's Parade": Actions,
             "4th of July Fireworks": Actions,
             "Vote": Actions,
-            "Bagel": Actions
+            "Bagel": Actions,
+            "A Slice of Pizza": Actions
         }
         rand_actions = {
             "Macy's Parade": ["Attend"],
             "4th of July Fireworks": ["Watch"],
             "Vote": ["Submit"],
-            "Bagel": ["Eat"]
+            "Bagel": ["Eat"],
+            "A Slice of Pizza": ["Eat"]
         }
         print("[Game] Selecting game modifier...")
         if (len(self.special_actions) > 0):
@@ -632,7 +634,7 @@ class Game:
 
             #print(debug_names)
             print(f"Generated {command.name}")
-            
+
         # Set this slot's instruction and notify the client
         slot.instruction = Instruction(slot, target, command, special_action=True if self.special_action else False)
 
